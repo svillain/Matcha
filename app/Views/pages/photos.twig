@@ -1,0 +1,105 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+    <div class="container">
+        <div class="main main-raised">
+            <div class="section">
+                <div class="container">
+                    <h3 class="text-center font-weight-bold my-4">Your photos</h3>
+                    <div class="alert alert-primary mb-4">
+                        <div class="container">
+                            <div class="alert-icon">
+                                <i class="material-icons">info_outline</i>
+                            </div>
+                            <b>Important :</b> You can only have <b>5</b> photos.<br><span class="font-italic">Think to change your default profil picture.</span>
+                        </div>
+                    </div>
+                    <div align="right">
+                        <form id="photoForm" enctype="multipart/form-data" action="{{ path_for('photos') }}"
+                              method="POST">
+                            <input name="photo" type="file" hidden>
+                            <button type="button" id="addPhoto" class="btn btn-success btn-xl"><i
+                                        class="material-icons">add_circle_outline</i>
+                                Add a
+                                picture
+                            </button>
+                        </form>
+                    </div>
+                    <div id="photosRow" class="row mt-4">
+                        {% if photos is empty %}
+                            <div class="col-lg-12 text-center">
+                                <h4>No photos to display, think to add photos!</h4>
+                            </div>
+                        {% endif %}
+                        {% for photo in photos %}
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <img src="/{{ settings.upload_dir ~ '/' ~ photo.fileName }}" alt=""
+                                     class="rounded img-fluid{% if photo.profil == true %} border border-primary"
+                                     style="border-width: 3px!important;"{% else %}"{% endif %}>
+                                <div class="float-right">
+                                    <button type="button" class="btn btn-info px-2" rel="tooltip"
+                                            data-placement="bottom"
+                                            data-original-title="Publish : {{ photo.created_at }}"><i
+                                                class="material-icons">bookmark</i></button>
+                                    {% if photo.profil == false %}
+                                        <form class="d-inline-block" method="POST"
+                                              action="{{ path_for('photos/profil', {'id':photo.id}) }}">
+                                            <button type="submit" class="btn btn-primary px-2" rel="tooltip"
+                                                    data-placement="bottom"
+                                                    data-original-title="Set to profil picture"><i
+                                                        class="material-icons">visibility</i></button>
+                                        </form>
+                                    {% endif %}
+                                    <form class="d-inline-block" method="POST"
+                                          action="{{ path_for('photos/delete', {'id':photo.id}) }}">
+                                        <button type="submit" class="btn btn-danger px-2" rel="tooltip"
+                                                data-placement="bottom"
+                                                data-original-title="Remove"><i
+                                                    class="material-icons">clear</i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Classic Modal -->
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        var photo = $("input[name*='photo']");
+        $('#photoForm').on('submit', function (e) {
+            var formData = new FormData();
+            formData.append('photo', photo[0].files[0]);
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                dataType: 'json',
+                cache: false,
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (d) {
+                    photo.val('');
+                    location.reload();
+                },
+                error: function (d) {
+                    showAlert('error', d.responseJSON);
+                    photo.val('');
+                },
+            });
+        });
+        $('#addPhoto').click(function (e) {
+            photo.trigger('click');
+        });
+        photo.on("change", function () {
+            $('#photoForm').submit();
+        });
+    </script>
+{% endblock %}

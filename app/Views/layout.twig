@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no'
+          name='viewport'/>
+    <title>Matcha</title>
+    <link rel="icon" type="image/png" href="/assets/img/favicon.png"/>
+    {% include 'imports/styles.twig' %}
+    {% block styles %} {% endblock %}
+</head>
+
+<body class="index-page sidebar-collapse header-filter clear-filter purple-filter bg-blue"
+      {% if auth.check %}style="min-height: 100vh" {% endif %}>
+{% include 'partials/flash.twig' %}
+{% include 'partials/nav.twig' %}
+
+<div class="{% if auth.check == false %}page-header{% endif %}">
+    {% include 'partials/bottom-bar.twig' %}
+    {% block content %} {% endblock %}
+</div>
+
+{% include 'partials/footer.twig' %}
+{% include 'imports/scripts.twig' %}
+
+<script>
+    $(document).ready(function () {
+        {% if auth.check %}
+            var nOpen = false;
+
+            $("#notificationsButton").click(function () {
+                nOpen = (!nOpen);
+                $("#notificationsBox").slideToggle();
+            });
+        {% endif %}
+    });
+</script>
+
+{% block scripts %}
+{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+<h1 style="text-align: center;">Forgot password for {{ user.username }}</h1>
+<p>Follow instruction to reset your password<br></p>
+<p>Go to <a href="{{ settings.base_url ~ '/reset/' ~ user.reset }}">this link</a> to reset your password</p>
+<p>Raw link : {{ settings.base_url ~ '/reset/' ~ user.reset }}</p>
+<p>Have a good day !</p>

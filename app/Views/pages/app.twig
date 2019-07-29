@@ -1,0 +1,147 @@
+{% extends 'layout.twig' %}
+
+{% block styles %}
+    <style>
+        .img-block-hover { /* container */
+
+        }
+
+        .img-hover { /* image */
+            opacity: 1;
+            width: 100%;
+            transition: .5s ease;
+            backface-visibility: hidden;
+        }
+
+        .img-hover-text { /* middle */
+            transition: .5s ease;
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .img-block-hover:hover .img-hover {
+            opacity: 0.5;
+        }
+
+        .img-block-hover:hover .img-hover-text {
+            opacity: 1;
+        }
+    </style>
+{% endblock %}
+
+
+
+
+{% block content %}
+    <div class="container">
+        <div class="main main-raised">
+            <div class="section">
+                <div class="container px-5">
+                    {% if uncompleted %}
+                        <h2>Your profil is not completed!</h2>
+                        <p>You can't interact with others users for the moment.</p>
+                        <p>Complet your profil <a class="font-weight-bold" href="{{ path_for('settings') }}">here</a>
+                        </p>
+                        <div class="alert alert-primary">
+                            <div class="container">
+                                <div class="alert-icon">
+                                    <i class="material-icons">offline_bolt</i>
+                                </div>
+                                <b>Missing :</b><br><br>
+                                {% for e in uncompleted %}
+                                    - {{ e }} <br>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        </p>
+                    {% else %}
+                        <h2>Find your love <i class="material-icons text-danger">whatshot</i></h2>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">search</i>
+                                                        </span>
+                                </div>
+                                <select id="orderBy" class="form-control custom-select">
+                                    <option data-id="location" selected>Location</option>
+                                    <option data-id="popularity">Popularity</option>
+                                    <option data-id="age_old">Older</option>
+                                    <option data-id="age_young">Younger</option>
+                                    <option data-id="interests">Common interests</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button id="suggestionMode" class="btn btn-primary btn-sm">Setup suggestion</button>
+                        </div>
+
+                        <div id="filters-interface" class="search-filter container">
+                            <div class="row">
+                                <div id="filter-interests" class="col-lg-12 col-md-12 col-sm-12"
+                                     style="z-index: 100000!important;">
+                                    <h5>Interests</h5>
+
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <select id="interests" data-placeholder="Choose yours interests..."
+                                                    class="form-control custom-select chosen-select"
+                                                    multiple tabindex="12" style="z-index: 99999999!important;">
+                                                {% for interest in interests %}
+                                                    <option value="{{ interest.id }}"
+                                                            {% for userinterest in user.interests if interest.id == userinterest.id %}{% if interest.id == userinterest.id %}selected{% endif %}{% endfor %}>{{ interest.name }}</option>
+
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% if errors.interests %}
+                                            <div class="d-block text-left text-danger">{{ errors.interests | first }}</div>{% endif %}
+                                    </div>
+                                </div>
+                                <div id="filter-age" class="col-lg-4 col-md-4 col-sm-12">
+                                    <h5>Age<span id="i-age" class="indicator float-right">[0, 0]</span></h5>
+                                    <div id="sliderAge" class="slider slider-rose"></div>
+                                </div>
+                                <div id="filter-location" class="col-lg-4 col-md-4 col-sm-12">
+                                    <h5>Location<span id="i-location" class="indicator float-right">[0, 0]</span></h5>
+                                    <div id="sliderLocation" class="slider slider-info"></div>
+                                </div>
+                                <div id="filter-popularity" class="col-lg-4 col-md-4 col-sm-12">
+                                    <h5>Popularity<span id="i-popularity" class="indicator float-right">[0, 0]</span>
+                                    </h5>
+                                    <div id="sliderPopularity" class="slider slider-success"></div>
+                                </div>
+                            </div>
+                            <div align="center">
+                                <button id="search-apply" class="btn btn-success btn-xl">Apply</button>
+                            </div>
+                        </div>
+
+
+                        <div id="find-users" class="row">
+
+                        </div>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="assets/js/search.js"></script>
+    <script>
+        $(document).ready(function () {
+            {% if not uncompleted %}
+            searchInit({{ userInfos|json_encode|raw }});
+            {% endif %}
+        });
+    </script>
+{% endblock %}

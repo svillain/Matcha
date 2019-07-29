@@ -1,0 +1,177 @@
+{% extends 'layout.twig' %}
+
+
+{% block content %}
+
+    <h1>{{ a }}</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7 ml-auto mr-auto">
+                <div class="brand">
+                    <div class="card card-nav-tabs">
+                        <div class="mx-auto card-header card-header-primary">
+                            <!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
+                            <div class="nav-tabs-navigation">
+                                <div class="nav-tabs-wrapper">
+                                    <ul class="nav nav-tabs" data-tabs="tabs">
+                                        <li class="nav-item">
+                                            <a class="nav-link {% if queries.register is defined or queries.connexion is not defined %}active{% endif %}"
+                                               href="#joinUs" data-toggle="tab">
+                                                <i class="material-icons">favorite</i> Join us
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link {% if queries.connexion is defined %}active{% endif %}"
+                                               href="#signIn" data-toggle="tab">
+                                                <i class="material-icons">face</i> Sign in
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="tab-pane {% if queries.register is defined or queries.connexion is not defined %}active{% endif %}"
+                                     id="joinUs">
+                                    <form class="form" method="POST" action="{{ path_for('register') }}">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">email</i>
+                                                        </span>
+                                                </div>
+                                                <input name="r_email" type="email" class="form-control"
+                                                       placeholder="Your email address" value="{{ old.r_email }}">
+                                            </div>
+                                            {% if errors.r_email %}
+                                                <div class="d-block text-left text-danger">{{ errors.r_email | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">assignment_ind</i>
+                                                        </span>
+                                                </div>
+                                                <input name="r_username" type="text" class="form-control"
+                                                       placeholder="Choose an username" value="{{ old.r_username }}">
+                                            </div>
+                                            {% if errors.r_username %}
+                                                <div class="d-block text-left text-danger">{{ errors.r_username | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">wc</i>
+                                                        </span>
+                                                </div>
+                                                <select name="r_sexe_id"
+                                                        class="form-control custom-select">
+                                                    {% if old.sexe_id is empty %}
+                                                        <option value="0"
+                                                                {% if old.sexe_id is not defined %}selected{% endif %}>
+                                                            Your sexe</option>{% endif %}
+                                                    {% for sexe in sexes %}
+                                                        <option value="{{ sexe.id }}"
+                                                                {% if old.r_sexe_id == sexe.id %}selected{% endif %}>{{ sexe.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% if errors.r_sexe_id %}
+                                                <div class="d-block text-left text-danger">{{ errors.r_sexe_id | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">hdr_weak</i>
+                                                        </span>
+                                                </div>
+                                                <input name="r_first_name" type="text" class="form-control"
+                                                       placeholder="Your first name" value="{{ old.r_first_name }}">
+                                            </div>
+                                            {% if errors.r_first_name %}
+                                                <div class="d-block text-left text-danger">{{ errors.r_first_name | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">hdr_strong</i>
+                                                        </span>
+                                                </div>
+                                                <input name="r_last_name" type="text" class="form-control"
+                                                       placeholder="Your last name" value="{{ old.r_last_name }}">
+                                            </div>
+                                            {% if errors.r_last_name %}
+                                                <div class="d-block text-left text-danger">{{ errors.r_last_name | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">vpn_key</i>
+                                                        </span>
+                                                </div>
+                                                <input name="r_password" type="password" class="form-control"
+                                                       placeholder="Your password to sign in">
+                                            </div>
+                                            {% if errors.r_password %}
+                                                <div class="d-block text-left text-danger">{{ errors.r_password | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="footer text-center">
+                                            <button type="submit" class="btn btn-primary py-3 btn-lg">Go !</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="tab-pane {% if queries.connexion is defined %}active{% endif %}"
+                                     id="signIn">
+                                    <form class="form" method="POST" action="{{ path_for('connexion') }}">
+
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">assignment_ind</i>
+                                                        </span>
+                                                </div>
+                                                <input name="c_username" type="text" class="form-control"
+                                                       placeholder="Your username" value="{{ old.c_username }}">
+                                            </div>
+                                            {% if errors.c_username %}
+                                                <div class="d-block text-left text-danger">{{ errors.c_username | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">vpn_key</i>
+                                                        </span>
+                                                </div>
+                                                <input name="c_password" type="password" class="form-control"
+                                                       placeholder="Your password" value="{{ old.c_password }}">
+                                            </div>
+                                            {% if errors.c_password %}
+                                                <div class="d-block text-left text-danger">{{ errors.c_password | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="text-right font-italic">
+                                            <a href="{{ path_for('forgot') }}">Password forgotten ?</a>
+                                        </div>
+                                        <div class="footer text-center">
+                                            <button type="submit" class="btn btn-primary py-3 btn-lg">Sign in</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

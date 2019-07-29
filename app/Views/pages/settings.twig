@@ -1,0 +1,352 @@
+{% extends 'layout.twig' %}
+
+{% block styles %}
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.css' rel='stylesheet'/>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="main main-raised">
+            <div class="section">
+                <div class="container">
+                    <h3 class="text-center font-weight-bold my-4">Settings</h3>
+                    <div class="row px-4">
+                        <div class="col-md-3 mb-5">
+                            <ul class="nav nav-pills nav-pills-icons flex-column" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#tabGeneral" role="tab" data-toggle="tab">
+                                        <i class="material-icons">dashboard</i> General
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#tabConfidential" role="tab" data-toggle="tab">
+                                        <i class="material-icons">schedule</i> Confidential
+                                    </a>
+                                </li>
+                                <li id="buttonLocation" class="nav-item">
+                                    <a class="nav-link" href="#tabLocation" role="tab" data-toggle="tab">
+                                        <i class="material-icons">place</i> Location
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-9">
+                            <form method="POST" action="{{ path_for('settings') }}">
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="tabGeneral">
+                                        <div class="alert alert-primary mb-4">
+                                            <div class="container">
+                                                <div class="alert-icon">
+                                                    <i class="material-icons">info_outline</i>
+                                                </div>
+                                                <b>Important :</b> Theses informations are visible by other user! Be
+                                                tidy!
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">assignment_ind</i>
+                                                        </span>
+                                                </div>
+                                                <input name="username" type="text" class="form-control"
+                                                       placeholder="Your username" value="{{ user.username }}">
+                                            </div>
+                                            {% if errors.username %}
+                                                <div class="d-block text-left text-danger">{{ errors.username | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">hdr_weak</i>
+                                                        </span>
+                                                </div>
+                                                <input name="first_name" type="text" class="form-control"
+                                                       placeholder="Your first name" value="{{ user.first_name }}">
+                                            </div>
+                                            {% if errors.first_name %}
+                                                <div class="d-block text-left text-danger">{{ errors.first_name | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">hdr_strong</i>
+                                                        </span>
+                                                </div>
+                                                <input name="last_name" type="text" class="form-control"
+                                                       placeholder="Your last name" value="{{ user.last_name }}">
+                                            </div>
+                                            {% if errors.last_name %}
+                                                <div class="d-block text-left text-danger">{{ errors.last_name | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">calendar_today</i>
+                                                        </span>
+                                                </div>
+                                                <input name="birthdate" {% if user.birthdate is empty %}type="text"
+                                                       onfocus="(this.type='date')"{% else %} type="date" {% endif %}class="form-control"
+                                                       placeholder="Your birthdate" value="{% if user.birthdate is not empty %}{{ user.birthdate|date('Y-m-d') }}{% endif %}">
+                                            </div>
+                                            {% if errors.birthdate %}
+                                                <div class="d-block text-left text-danger">{{ errors.birthdate | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">360</i>
+                                                        </span>
+                                                </div>
+                                                <textarea name="biography" rows="4" class="form-control"
+                                                          placeholder="Your biography">{{ user.biography }}</textarea>
+                                            </div>
+                                            {% if errors.biography %}
+                                                <div class="d-block text-left text-danger">{{ errors.biography | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">extension</i>
+                                                        </span>
+                                                </div>
+                                                <select name="interests[]" data-placeholder="Choose yours interests..."
+                                                        class="form-control custom-select chosen-select"
+                                                        multiple tabindex="12">
+                                                    {% for interest in interests %}
+                                                        <option value="{{ interest.id }}"
+                                                                {% for userinterest in user.interests if interest.id == userinterest.id %}{% if interest.id == userinterest.id %}selected{% endif %}{% endfor %}>{{ interest.name }}</option>
+
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% if errors.interests %}
+                                                <div class="d-block text-left text-danger">{{ errors.interests | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">wc</i>
+                                                        </span>
+                                                </div>
+                                                <select name="sexe"
+                                                        class="form-control custom-select">
+                                                    {% if user.sexe_id is empty %}
+                                                        <option value="" disabled selected>Your sexe</option>{% endif %}
+                                                    {% for sexe in sexes %}
+                                                        <option value="{{ sexe.id }}"
+                                                                {% if user.sexe_id == sexe.id %}selected{% endif %}>{{ sexe.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% if errors.sexe %}
+                                                <div class="d-block text-left text-danger">{{ errors.sexe | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">swap_horiz</i>
+                                                        </span>
+                                                </div>
+                                                <select name="orientation"
+                                                        class="form-control custom-select">
+                                                    {% if user.orientation_id is empty %}
+                                                        <option value="" disabled selected>Your orientation
+                                                        </option>{% endif %}
+                                                    {% for orientation in orientations %}
+                                                        <option value="{{ orientation.id }}"
+                                                                {% if user.orientation_id == orientation.id %}selected{% endif %}>{{ orientation.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% if errors.orientation %}
+                                                <div class="d-block text-left text-danger">{{ errors.orientation | first }}</div>{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tabConfidential">
+                                        <div class="alert alert-primary">
+                                            <div class="container">
+                                                <div class="alert-icon">
+                                                    <i class="material-icons">info_outline</i>
+                                                </div>
+                                                <b>Important :</b> You need to know your current password to change it!
+                                            </div>
+                                        </div>
+                                        <div align="center">
+                                            <button type="button" class="btn btn-success py-1 mt-2 btn-xs"
+                                                    data-toggle="modal" data-target="#changePassword">Change password
+                                            </button>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">email</i>
+                                                        </span>
+                                                </div>
+                                                <input name="email" type="text" class="form-control"
+                                                       placeholder="Your email address" value="{{ user.email }}">
+                                            </div>
+                                            {% if errors.email %}
+                                                <div class="d-block text-left text-danger">{{ errors.email | first }}</div>{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tabLocation">
+                                        <div class="alert alert-primary">
+                                            <div class="container">
+                                                <div class="alert-icon">
+                                                    <i class="material-icons">info_outline</i>
+                                                </div>
+                                                <b>Important :</b> Give us your localation to use all features of the
+                                                service
+                                            </div>
+                                        </div>
+                                        <div align="center">
+                                            <button id="updateLocation" type="button"
+                                                    class="btn btn-success py-1 mt-2 btn-xs">Update my
+                                                location automatically
+                                            </button>
+                                        </div>
+                                        <div class="form-group">
+                                            <input hidden name="latitude" type="text" class="form-control"
+                                                   placeholder="Your latitude" value="{% if user.latitude %}{{ user.latitude }}{% endif %}">
+                                            {% if errors.latitude %}
+                                                <div class="d-block text-left text-danger">{{ errors.latitude | first }}</div>{% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <input hidden name="longitude" type="text" class="form-control"
+                                                   placeholder="Your longitude" value="{% if user.longitude %}{{ user.longitude }}{% endif %}">
+                                            {% if errors.longitude %}
+                                                <div class="d-block text-left text-danger">{{ errors.longitude | first }}</div>{% endif %}
+                                        </div>
+                                        <p id="mapDetails" class="bg-dark text-white p-1" style="width: 100%;"></p>
+                                        <div style="height: 300px;" class="mt-0" id="map"></div>
+                                    </div>
+                                </div>
+                                <div class="footer text-right">
+                                    <button type="submit" class="btn btn-primary py-3 mt-5 btn-lg">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Classic Modal -->
+    <div class="modal fade" id="changePassword" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close text-primary" data-dismiss="modal" aria-label="Close">
+                        <i class="material-icons">clear</i>
+                    </button>
+                </div>
+                <form action="{{ path_for('settings/password') }}" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                      <i class="material-icons">vpn_key</i>
+                                    </span>
+                                </div>
+                                <input name="old_password" type="password" class="form-control"
+                                       placeholder="Your current password" value="">
+                            </div>
+                            {% if errors.old_password %}
+                                <div class="d-block text-left text-danger">{{ errors.old_password | first }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                      <i class="material-icons">vpn_key</i>
+                                    </span>
+                                </div>
+                                <input name="new_password" type="password" class="form-control"
+                                       placeholder="Your new password" value="">
+                            </div>
+                            {% if errors.new_password %}
+                                <div class="d-block text-left text-danger">{{ errors.new_password | first }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                      <i class="material-icons">vpn_key</i>
+                                    </span>
+                                </div>
+                                <input name="new_password_verification" type="password" class="form-control"
+                                       placeholder="Verify your new password"
+                                       value="">
+                            </div>
+                            {% if errors.new_password_verification %}
+                                <div class="d-block text-left text-danger">{{ errors.new_password_verification | first }}</div>{% endif %}
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Change</button>
+                        <button type="button" class="btn btn-danger btn-link" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Classic Modal -->
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfKO5eI37yq2AmUCW0MGfiFSCuLDqQvsQ" async
+            defer></script>
+    <script>
+        $( document ).ready(function () {
+            var map;
+            initCoord(function (pos) {
+                var input_lat = $('input[name="latitude"]');
+                var input_lng = $('input[name="longitude"]');
+                if (input_lat.val() === "" || input_lat.val() === null || input_lat.val() === undefined) input_lat.val(pos.lat);
+                if (input_lng.val() === "" || input_lng.val() === null || input_lng.val() === undefined) input_lng.val(pos.lng);
+                $('#buttonLocation').click(function () {
+                    map = createMap(pos.lng, pos.lat);
+
+                    $('#updateLocation').click(function () {
+                        getCoordinates(map);
+                    });
+
+                    map.on('click', function (e) {
+                        var lng = e.lngLat.lng, lat = e.lngLat.lat;
+                        updateMap(map, lng, lat);
+                    });
+                });
+            });
+        });
+
+        {% if queries.password is defined %}
+        $('#changePassword').modal('show')
+        {% endif %}
+
+        var config = {
+            '.chosen-select': {},
+            '.chosen-select-deselect': {allow_single_deselect: true},
+            '.chosen-select-no-single': {disable_search_threshold: 10},
+            '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
+            '.chosen-select-rtl': {rtl: true},
+            '.chosen-select-width': {width: '95%'}
+        };
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+    </script>
+{% endblock %}

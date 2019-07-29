@@ -1,0 +1,56 @@
+<nav class="navbar sticky-top navbar-expand-lg"
+     id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand font-weight-bold" href="{{ path_for('home') }}">
+                <h3 class="m-0"><img class="mb-1" height="40" src="/assets/img/bowtie.png">Matcha</h3></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                {% if auth.check %}
+                    <li class="nav-item">
+                        <a class="nav-link text-primary" href="{{ path_for('chat') }}">
+                            <i class="material-icons text-info">chat</i> Chat
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary" href="{{ path_for('home') }}">
+                            <i class="material-icons text-info">search</i> Search people
+                        </a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a href="#" class="dropdown-toggle nav-link text-primary" data-toggle="dropdown">
+                            <i class="material-icons text-info">account_circle</i> {{ auth.user.first_name }}
+                        </a>
+                        <div class="dropdown-menu dropdown-with-icons">
+                            <a href="{{ path_for('profil', {'id': auth.user.id}) }}"
+                               class="dropdown-item">
+                                <i class="material-icons">face</i> My profil
+                            </a>
+                            <a href="{{ path_for('photos') }}"
+                               class="dropdown-item">
+                                <i class="material-icons">insert_photo</i> Photos
+                            </a>
+                            <a href="{{ path_for('settings') }}"
+                               class="dropdown-item">
+                                <i class="material-icons">build</i> Settings
+                            </a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary" href="{{ path_for('logout') }}">
+                            <i class="material-icons text-danger">power_settings_new</i> Log out
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

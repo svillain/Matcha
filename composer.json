@@ -1,0 +1,29 @@
+{
+    "name": "ashk/matcha",
+    "authors": [
+        {
+            "name": "Adrien (Ashk)",
+            "email": "timed2a@hotmail.fr"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "bootstrap/utils.php"
+        ]
+    },
+    "require": {
+        "slim/slim": "^3.10",
+        "slim/flash": "^0.4.0",
+        "slim/twig-view": "^2.4",
+        "slim/csrf": "^0.8.3",
+        "vlucas/phpdotenv": "^2.5",
+        "symfony/var-dumper": "^4.1",
+        "monolog/monolog": "^1.23",
+        "cboden/ratchet": "^0.4.1",
+        "fzaninotto/faker": "^1.8",
+        "andrewdyer/slim3-mailer": "^1.1"
+    }
+}

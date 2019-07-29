@@ -1,0 +1,39 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7 ml-auto mr-auto">
+                <div class="brand">
+                    <div class="card card-nav-tabs">
+                        <div class="card-body">
+                            <h2>Password forgot</h2>
+                            <p>Type your email and instructions will be send on it!</p>
+                            <form class="form" method="POST" action="{{ path_for('forgot') }}">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                          <i class="material-icons">email</i>
+                                                        </span>
+                                        </div>
+                                        <input name="f_email" type="email" class="form-control"
+                                               placeholder="Your email" value="{{ old.f_email }}">
+                                    </div>
+                                    {% if errors.f_email %}
+                                        <div class="d-block text-left text-danger">{{ errors.f_email | first }}</div>{% endif %}
+                                </div>
+                                <div class="footer text-center">
+                                    <a href="{{ path_for('home') }}" class="btn btn-danger py-3 btn-lg">Back</a>
+                                    <button type="submit" class="btn btn-primary py-3 btn-lg">Send</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

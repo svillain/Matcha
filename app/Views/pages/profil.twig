@@ -1,0 +1,333 @@
+{% extends 'layout.twig' %}
+
+{% block styles %}
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.css' rel='stylesheet'/>
+
+    <style>
+        .slick-slide {
+            display: inline-block !important;
+            margin-right: 5px;
+            margin-left: 5px;
+        }
+
+        .slider {
+            display: inline-block !important;
+            position: relative;
+            text-align: center;
+            opacity: 1;
+            border: 1px solid #9c27b0;
+            z-index: 2 !important;
+            transition: all .5s;
+            width: auto !important;
+        }
+
+        .slider:hover {
+            transition: all .5s;
+        }
+
+        .slick-prev:before {
+            color: #9c27b0;
+        }
+
+        .slick-next:before {
+            color: #9c27b0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% set isCurrent = auth.user.id == user.id %}
+    {% set hasLike = auth.hasLike(user.id) %}
+    {% set isLikeBy = auth.isLikeBy(user.id) %}
+    {% set matched = auth.matchWith(user.id) %}
+    <div class="container">
+        <input type="hidden" id="lngraw" value="{{ user.longitude }}">
+        <input type="hidden" id="latraw" value="{{ user.latitude }}">
+        <input type="hidden" id="dcraw" value="{{ user.disconnected_at }}">
+        <div class="main main-raised">
+            <div class="section">
+                <div class="container px-5">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-6 text-left">
+                                        <button rel="tooltip" data-placement="bottom" data-original-title="Score" class="btn btn-primary btn-sm font-weight-bold"><i
+                                                    class="fa fa-star"></i> {{ user.score }}
+                                        </button>
+                                    </div>
+
+                                    <div class="col-6 text-right">
+                                        {% if not isCurrent %}
+                                            <form class="d-inline-block" method="POST"
+                                                  action="{{ path_for('like', {'id':user.id}) }}">
+                                                <button rel="tooltip" title="" data-placement="bottom"
+                                                        data-original-title="
+                                                            {% if hasLike %}Unlike {{ user.first_name }} {% if matched %}(You match with this user){% endif %}
+                                                            {% else %}Like {{ user.first_name }} {% if isLikeBy %}(This user like you){% endif %}{% endif %}
+                                                        "
+                                                        type="submit" class="btn btn-primary btn-sm px-2"><i
+                                                            class="fa {% if matched %}fa-superpowers{% elseif hasLike %}fa-heart{% else %}fa-thumbs-up{% endif %}"></i>
+                                                </button>
+                                            </form>
+                                            <button rel="tooltip" title="" data-placement="bottom"
+                                                    data-original-title="Report" class="btn btn-danger btn-sm px-2" data-toggle="modal"
+                                                    data-target="#reportUser"><i class="fa fa-exclamation-triangle"></i>
+                                            </button>
+                                        {% else %}
+                                            <a href="{{ path_for('settings') }}" class="btn btn-info btn-sm px-2"><i
+                                                        class="fa fa-pencil"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </div>
+                            <h2 class="text-center mb-3">
+                                <i class="fa fa-circle text-{% if user.online == 1 %}success{% else %}danger{% endif %}"></i> {{ user.first_name }}
+                                <b>{{ user.last_name }}</b>
+                            </h2>
+                            {% if user.online == 0 %}<p id="disconnected"></p>{% endif %}
+                            <div class="suggestions container">
+                                {% for photo in user.photos %}
+                                    <div class="slider" style="height: 100%; width:100%!important;">
+                                        <img height="200" style="width: 100%"
+                                             src="/{{ settings.upload_dir ~ '/' ~ photo.fileName }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="profile-head">
+                                <p class="m-auto w-50 text-center">
+                                    {{ user.biography }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-lg-6">
+                            <h5>About me</h5>
+                            <table style="width:100%">
+                                <tr>
+                                    <th>Username :</th>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sexe :</th>
+                                    <td>
+                                        <i class="fa {% if user.sexe.name == 'Man' %}fa-mars{% else %}fa-venus{% endif %}"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Orientation :</th>
+                                    <td>{{ user.orientation.name }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Age :</th>
+                                    {% if user.birthdate %}
+                                        <td>{{ user.age }} years old
+                                            <small>({{ user.birthdate | date('d/m/Y') }})</small>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            Unknow
+                                        </td>
+                                    {% endif %}
+                                </tr>
+
+                                <tr>
+                                    <th>Location :</th>
+                                    <td>
+                                        <button id="buttonLocation" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                data-target="#locationModal">See here
+                                        </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-lg-6">
+                            {% if auth.user.id != user.id %}
+                                <h5>My interests</h5>
+                                {% for interest in user.interests %}
+                                    <span class="badge badge-pill badge-primary">{{ interest.name }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <!-- Tabs with icons on Card -->
+                                <div class="card card-nav-tabs">
+                                    <div class="card-header card-header-primary">
+                                        <!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
+                                        <div class="nav-tabs-navigation">
+                                            <div class="nav-tabs-wrapper">
+                                                <ul class="nav nav-tabs" data-tabs="tabs">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link active" href="#colVisitors"
+                                                           data-toggle="tab">
+                                                            <i class="material-icons">poll</i>
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" href="#colLikes" data-toggle="tab">
+                                                            <i class="material-icons">thumb_up</i>
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" href="#colMatches" data-toggle="tab">
+                                                            <i class="fa fa-superpowers"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body ">
+                                        <div class="tab-content text-left">
+                                            <div class="tab-pane active" id="colVisitors">
+                                                <ul>
+                                                    {% for visit in user.visited|reverse %}
+                                                        <li>
+                                                            <a href="{{ path_for('profil', {'id':visit.user.id}) }}">{{ visit.user.username }}</a>
+                                                            visit you ({{ visit.updated_at }})
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="tab-pane" id="colLikes">
+                                                <ul>
+                                                    {% for like in user.liked|reverse %}
+                                                        <li>
+                                                            <a href="{{ path_for('profil', {'id':like.user.id}) }}">{{ like.user.username }}</a>
+                                                            like you ({{ like.created_at }})
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="tab-pane" id="colMatches">
+                                                <ul>
+                                                    {% for match in user.matchs|reverse %}
+                                                        <li>
+                                                            <a href="{{ path_for('profil', {'id':match.id}) }}">{{ match.username }}</a>
+                                                            match with you!
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End Tabs with icons on Card -->
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="locationModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close text-primary" data-dismiss="modal" aria-label="Close">
+                        <i class="material-icons">clear</i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="height: 300px;" class="mt-0" id="map"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-link" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="reportUser" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close text-primary" data-dismiss="modal" aria-label="Close">
+                        <i class="material-icons">clear</i>
+                    </button>
+                </div>
+                <form action="{{ path_for('report', {'id':user.id}) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <h5 class="text-center">You want report this user ? Is he a fake account ? </h5>
+                            <div class="form-check">
+                                <label class="form-check-label  text-primary">
+                                    <input name="fake" class="form-check-input" type="checkbox" value=""> Fake
+                                    account
+                                    <span class="form-check-sign">
+                                <span class="check"></span>
+                                </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Report</button>
+                        <button type="button" class="btn btn-danger btn-link" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfKO5eI37yq2AmUCW0MGfiFSCuLDqQvsQ" async
+            defer></script>
+    <script>
+        $( document ).ready(function () {
+            var u_lng = $('#lngraw').val();
+            var u_lat = $('#latraw').val();
+            var u_disconnected_at = $('#dcraw').val();
+
+            var map;
+            $('#buttonLocation').click(function () {
+                map = createMap(u_lng, u_lat);
+                map.on('click', function (e) {
+                    updateMap(map, u_lng, u_lat);
+                });
+            });
+
+            $("#disconnected").text("Last activity : " + moment(u_disconnected_at, "YYYY-MM-DD HH:mm:SS").fromNow());
+            const $slider = $('.suggestions').slick({
+                dots: false,
+                infinite: true,
+                speed: 1300,
+                slidesToShow: 4,
+                slidesToScroll: 4,
+                responsive: [
+                    {
+                        breakpoint: 1220,
+                        settings: {
+                            slidesToShow: 3,
+                            slidesToScroll: 3,
+                        }
+                    },
+                    {
+                        breakpoint: 780,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+{% endblock %}
